@@ -1,10 +1,18 @@
+import harvest
+import setup
 
 
-# web scraping amazon books on my wishlist
-# scrap one book to see how the data looks
-# get the price data 
-# store in a dictionary
-# maybe compare to camelcamel.com
-# export csv file with price data
-# if price data is lower than previous time make it green
-# if price has gone up since previous make it red
+def main():
+    driver = setup.make_driver()
+    setup.open_browser(driver)
+    harvest.continue_checker(driver)
+    # harvest.scroll_loop(driver)
+    harvest.get_data(driver)
+    # title_names = harvest.get_names(driver)
+    # price_books = harvest.get_prices(driver)
+    # links  = harvest.get_links(driver)
+    # harvest.combine_names_prices(title_names, price_books)
+    # harvest.get_ibn_number(driver, links)
+
+
+main()
