@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import time
+import setup
 
 
 def clear_empty_elems(list):
@@ -88,7 +89,7 @@ def get_data(webdriver):
             webdriver.fullscreen_window()
             ibn_num = get_ibn_number(webdriver)
             book_price_data[name].append(ibn_num)
-            go_back_open_browser(webdriver)
+            setup.go_back_open_browser(webdriver)
             i += 1
             print(f"{name} - {book_price_data[name]}")
             if i == len(get_links_func):
@@ -97,12 +98,6 @@ def get_data(webdriver):
     print(len(book_price_data))        
     df = pd.DataFrame(book_price_data)
     df.to_csv("data.csv", index=False)
-
-def go_back_open_browser(webdriver):
-    time.sleep(0.5)
-    webdriver.back()
-    time.sleep(0.5)
-    webdriver.fullscreen_window()
 
 def func_scroll_from_origin(webdriver, first_elem, link):
     time.sleep(1)
