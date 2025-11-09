@@ -5,6 +5,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import pandas as pd
 import time
 
 
@@ -16,18 +17,6 @@ def clear_empty_elems(list):
         else:
             new_list.append(i)
     return new_list        
-
-def scroll_loop(webdrive):
-    scroll_to =  webdrive.find_element(By.XPATH, "/html/body/div[2]/div[1]/div/div/div/div/div/div[2]/div[8]/div/div/ul/li[11]")
-    scroll_origin = ScrollOrigin.from_element(scroll_to)
-    ActionChains(webdrive).scroll_from_origin(scroll_origin, 0, 700).perform()
-    time.sleep(3)
-    not_end = True
-    while not_end:
-        ActionChains(webdrive).scroll_by_amount(0, 700).perform()
-        time.sleep(2)
-        if webdrive.find_element(By.TAG_NAME, "h5").text == "End of list":
-            not_end = False
 
 def continue_checker(webdrive):
     try:
@@ -42,7 +31,6 @@ def continue_checker(webdrive):
 def get_names(webdrive):
     title_names = webdrive.find_elements(By.TAG_NAME, "h2")
     new_title_names = clear_empty_elems(title_names)
-    # use this to scroll through all the selenium elems to click
     return new_title_names
 
 def get_links(webdrive):
@@ -53,7 +41,6 @@ def get_prices(webdrive):
     price_for_books = webdrive.find_elements(By.CLASS_NAME, "a-price")
     return price_for_books
 
-# using return of get_names
 def get_ibn_number(webdriver):
     ibn_num = webdriver.find_element(By.CSS_SELECTOR, "#detailBulletsWrapper_feature_div")
     ibn_list = ibn_num.text.split()
@@ -64,9 +51,6 @@ def get_ibn_loop(ibn_list):
         if ibn_list[i] == "ISBN-10" or ibn_list[i] == "ISBN-13":
             return ibn_list[i+2]
         
-
-        
-
 def combine_names_prices(title_names, price_books):
     book_price_dict = {}
     for name, price in zip(title_names, price_books):
@@ -75,7 +59,6 @@ def combine_names_prices(title_names, price_books):
         
         book_price_dict[name.text] = price.text
     print(book_price_dict)
-
 
 
 def get_data(webdriver):
@@ -112,6 +95,8 @@ def get_data(webdriver):
                 break
     print(book_price_data)
     print(len(book_price_data))        
+    df = pd.DataFrame(book_price_data)
+    df.to_csv("data.csv", index=False)
 
 def go_back_open_browser(webdriver):
     time.sleep(0.5)
@@ -129,22 +114,8 @@ def func_scroll_from_origin(webdriver, first_elem, link):
         else:
             break    
 
-
-
 def get_data_helper(element, counter, book_price_dict, holder_list, driver):
     price = get_prices(driver)[counter].text
     name = element.text
     book_price_dict[name] = [price]
     holder_list.append(name)
-
-# findelems
-# while true:
-#   if name not in findelems.text
-#       driver.gotoelem
-#       getname 
-#       getprice 
-#       findeelems[i].click()
-#       get ibn
-#       list.append(name)
-#       findelems
-

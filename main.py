@@ -1,12 +1,14 @@
 import harvest
 import setup
 
+AMAZON_URL = "https://www.amazon.com/hz/wishlist/ls/299PQKIASMWBC/ref=nav_wishlist_lists_1"
+
+CAMEL_URL = "https://camelcamelcamel.com/"
 
 def main():
     driver = setup.make_driver()
     setup.open_browser(driver)
     harvest.continue_checker(driver)
-    # harvest.scroll_loop(driver)
     harvest.get_data(driver)
     # title_names = harvest.get_names(driver)
     # price_books = harvest.get_prices(driver)

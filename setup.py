@@ -5,7 +5,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
 import time
 
-URL = "https://www.amazon.com/hz/wishlist/ls/299PQKIASMWBC/ref=nav_wishlist_lists_1"
+
 
 def make_driver():
     chrome_options = webdriver.ChromeOptions()
@@ -16,7 +16,7 @@ def make_driver():
 def tear_down(webdriver):
     webdriver.quit()
 
-def open_browser(webdrive):
-    webdrive.get(URL)
+def open_browser(webdrive, url):
+    webdrive.get(url)
     webdrive.fullscreen_window()
     time.sleep(2)
