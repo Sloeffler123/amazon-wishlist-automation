@@ -12,7 +12,7 @@ def main():
     # harvest.get_data(driver)
     driver.switch_to.new_window("tab")
     setup.open_browser(driver, CAMEL_URL)
-    camel.read_isbn()
+    camel.main_camel_loop(camel.get_csv_data(1), driver, camel.get_csv_data(None), camel.get_csv_data(0))
 
 
 
