@@ -61,7 +61,6 @@ def combine_names_prices(title_names, price_books):
         book_price_dict[name.text] = price.text
     print(book_price_dict)
 
-
 def get_data(webdriver):
     wait = WebDriverWait(webdriver, 10)
     i = 0
