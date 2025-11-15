@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import keepa
-import requests
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,8 +25,8 @@ def seperate_ISBN10_ISBN13():
     isbn_13 = []
     isbn_10 = []
     for num in nums:
-        if "-" in num:
-            isbn_13.append(num)
+        if "-" in num or len(num) > 10:
+            isbn_13.append(num.replace("-", ""))
         else:
             isbn_10.append(num)        
     return isbn_10, isbn_13
@@ -51,42 +51,61 @@ def add_vars_to_list(data_list, name, max_date, min_date):
     main_list = [name] + data_list
     return main_list
 
-def make_data_dict(max, min, avg, current, max_date, min_date, count):
+def make_data_dict(title, max, min, avg, current, max_date, min_date, count, data_dict):
     column_names = ["Title", "Max", "Min", "Avg365", "Current", "Max Date", "Min Date"]
-    names = get_csv_data(None)
-    data_dict = df_loop(column_names, add_vars_to_list(convert_to_currency(max, min, avg, current), names[count], max_date, min_date))
+    df_loop(column_names, add_vars_to_list(convert_to_currency(max, min, avg, current), title, max_date, min_date), data_dict)
 
-def df_loop(column_names, main_list):
-    data_dict = {}
+def df_loop(column_names, main_list, data_dict):
     for name, data  in zip(column_names, main_list):
         if data_dict.get(name) is not None:
             data_dict[name].append(data)
         else:
             data_dict[name] = [data]    
+            
 
-def main_loop(isbn_list):
+def main_loop(isbn_list, data_dict):
     # need to make dict here
     for i in range(len(isbn_list)):
 
-        amazon_current_price = isbn_list[i]["stats"]["current"][0]
-        amazon_max_price = isbn_list[i]["stats"]["max"][0][1]
-        amazon_max_price_time = isbn_list[i]["stats"]["max"][0][0]
-        amazon_time_max_price = keepa.keepa_minutes_to_time(amazon_max_price_time)
-        amazon_min_price = isbn_list[i]["stats"]["min"][0][1]
-        amazon_min_price_time = isbn_list[i]["stats"]["min"][0][0]
-        amazon_time_min_price = keepa.keepa_minutes_to_time(amazon_min_price_time)
-        amazon_avg365_price = isbn_list[i]["stats"]["avg365"][0]
+        try:
+            title = isbn_list[i]["title"]
+            amazon_current_price = isbn_list[i]["stats"]["current"][0]
+            amazon_max_price = isbn_list[i]["stats"]["max"][0][1]
+            amazon_max_price_time = isbn_list[i]["stats"]["max"][0][0]
+            amazon_time_max_price = keepa.keepa_minutes_to_time(amazon_max_price_time)
+            amazon_min_price = isbn_list[i]["stats"]["min"][0][1]
+            amazon_min_price_time = isbn_list[i]["stats"]["min"][0][0]
+            amazon_time_min_price = keepa.keepa_minutes_to_time(amazon_min_price_time)
+            amazon_avg365_price = isbn_list[i]["stats"]["avg365"][0]
+        except TypeError:
+            print(f"{isbn_list[i]} couldnt find value")
+            
+        make_data_dict(title, amazon_max_price, amazon_min_price, amazon_avg365_price, amazon_current_price, amazon_time_max_price, amazon_time_min_price, i, data_dict)
 
-        data = make_data_dict(amazon_max_price, amazon_min_price, amazon_avg365_price, amazon_current_price, amazon_time_max_price, amazon_time_min_price, i)
-    print(data)    
 
 def api_query():
     
+    all_data_dict = {}
+
     isbn_10, isbn_13 = seperate_ISBN10_ISBN13()
-    test = [isbn_10[0], isbn_10[1], isbn_10[2], isbn_10[3], isbn_10[4]]
-    isbn_10_products = api.query(items=test, history=False, to_datetime=False, out_of_stock_as_nan=False, progress_bar=False, buybox=False, wait=False, offers=None, stock=False, stats=0)
-    # get the current price from api
-    main_loop(isbn_10_products)
+    
+    isbn_13_products = api.query(items=isbn_13, history=False, to_datetime=False, out_of_stock_as_nan=False, progress_bar=False, buybox=False, wait=False, offers=None, stock=False, stats=0, product_code_is_asin=False)
+    
+    try:
+        isbn_10_products = api.query(items=isbn_10, history=False, to_datetime=False, out_of_stock_as_nan=False, progress_bar=False,buybox=False, wait=False, offers=None, stock=False, stats=0)
+    except KeyError:
+        print(f"key failed")
+    
+    try:
+        main_loop(isbn_10_products, all_data_dict)
+    except TimeoutError:
+        time.sleep(10)
+        main_loop(isbn_10_products, all_data_dict)
+    # main_loop(isbn_13_products, all_data_dict)
+    df = pd.DataFrame(all_data_dict)
+    print(df)
+
+    df.to_csv("main_csv_data.csv", index=False)
     
 
 api_query()
