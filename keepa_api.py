@@ -45,13 +45,17 @@ def convert_to_currency(max, min, avg, current):
     
     return new_lst    
 
+def determine_good_deal(max, min, current):
+    deal = (current - min) / (max - min) * 100
+    print(f"{round(deal)}%")
+
 def add_vars_to_list(data_list, name, max_date, min_date):
     data_list.append(max_date)
     data_list.append(min_date)
     main_list = [name] + data_list
     return main_list
 
-def make_data_dict(title, max, min, avg, current, max_date, min_date, count, data_dict):
+def make_data_dict(title, max, min, avg, current, max_date, min_date, data_dict):
     column_names = ["Title", "Max", "Min", "Avg365", "Current", "Max Date", "Min Date"]
     df_loop(column_names, add_vars_to_list(convert_to_currency(max, min, avg, current), title, max_date, min_date), data_dict)
 
@@ -79,7 +83,7 @@ def main_loop(isbn_list, data_dict):
             amazon_avg365_price = isbn_list[i]["stats"]["avg365"][0]
         except TypeError:
             print(f"{isbn_list[i]} couldnt find value")
-            
+
         make_data_dict(title, amazon_max_price, amazon_min_price, amazon_avg365_price, amazon_current_price, amazon_time_max_price, amazon_time_min_price, i, data_dict)
 
 
@@ -107,5 +111,5 @@ def api_query():
 
     df.to_csv("main_csv_data.csv", index=False)
     
-
-api_query()
+determine_good_deal(44.95, 16.31, 26.64)
+# api_query()
