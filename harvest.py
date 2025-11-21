@@ -1,4 +1,4 @@
-from selenium import webdriver
+
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import ActionChains
@@ -56,7 +56,9 @@ def get_data(webdriver):
             if i == len(get_links_func):
                 break
     print(isbn_list)
-    print(len(isbn_list))        
+    print(len(isbn_list))  
+    with open ("data_file.txt", "w") as f:
+        f.write("\n".join(isbn_list))
 
 def click_elem(elem, webdriver, wait):
     time.sleep(0.5)

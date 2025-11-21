@@ -16,11 +16,10 @@ def get_csv_data(row):
     else:
         return df.iloc[row]
 
-def seperate_ISBN10_ISBN13():
-    nums = get_csv_data(1)
+def seperate_ISBN10_ISBN13(isbn_list):
     isbn_13 = []
     isbn_10 = []
-    for num in nums:
+    for num in isbn_list:
         try:
             if "-" in num or len(num) > 10:
                 isbn_13.append(num.replace("-", ""))
@@ -84,8 +83,10 @@ def main_loop(isbn_list, data_dict):
             print(f"{isbn_list[i]} couldnt find value")
 
 def api_query():
+    with open("data_file.txt", "r") as isbn_list:
+        isbn_list = [line.rstrip("\n") for line in isbn_list]
     all_data_dict = {}
-    isbn_10, isbn_13 = seperate_ISBN10_ISBN13()
+    isbn_10, isbn_13 = seperate_ISBN10_ISBN13(isbn_list)
     
     try:
         isbn_13_products = api.query(items=isbn_13, history=False, to_datetime=False, out_of_stock_as_nan=False, progress_bar=False,buybox=False, wait=False, offers=None, stock=False, stats=0, product_code_is_asin=False)
@@ -110,4 +111,4 @@ def api_query():
     print(df)
     df.to_csv("main_csv_data.csv", index=False)  
 
-api_query()
+# api_query()
