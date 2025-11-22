@@ -37,26 +37,19 @@ def get_data(webdriver):
     wait = WebDriverWait(webdriver, 10)
     i = 0
     links_list_holder = []
-    # book_price_data = {}
     isbn_list = []
     while True:
         time.sleep(7)
-        # get_names_func = get_names(webdriver)
         get_links_func = get_links(webdriver)
-        print(f"{i} - {len(get_links_func)}")
         if get_links_func[i] not in links_list_holder:
             elem = get_links_func[i]
-            # get_data_helper(elem, i, book_price_data, names_list_holder, webdriver)
             click_elem(elem, webdriver, wait)
             isbn_num = get_ibn_number(webdriver)
             isbn_list.append(isbn_num)
             setup.go_back_open_browser(webdriver)
             i += 1
-            print(f"{isbn_num}")
             if i == len(get_links_func):
-                break
-    print(isbn_list)
-    print(len(isbn_list))  
+                break  
     with open ("data_file.txt", "w") as f:
         f.write("\n".join(isbn_list))
 

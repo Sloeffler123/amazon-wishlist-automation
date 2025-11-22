@@ -7,14 +7,6 @@ from dotenv import load_dotenv
 load_dotenv()
 API_KEY = os.getenv("KEEPA_API_KEY")
 api = keepa.Keepa(API_KEY)
-# seperate from ISBN-10 from ISBN-13
-# 1 gets isbn 0 gets prices None gets names
-def get_csv_data(row):
-    df = pd.read_csv("data.csv")
-    if row is None:
-        return df.columns
-    else:
-        return df.iloc[row]
 
 def seperate_ISBN10_ISBN13(isbn_list):
     isbn_13 = []

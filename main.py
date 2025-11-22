@@ -10,4 +10,4 @@ def main():
     harvest.get_data(driver)
     
 
-main()
+# main()
