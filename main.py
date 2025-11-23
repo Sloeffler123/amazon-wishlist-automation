@@ -11,3 +11,9 @@ def main():
     
 
 # main()
+
+
+#get the asin by using data-csa-c-item-id
+#try infinite scroll to load all products
+#check if there are more pages at end of list
+#clean up try excepts

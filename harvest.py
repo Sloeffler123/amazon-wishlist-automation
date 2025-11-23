@@ -2,10 +2,8 @@
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import ActionChains
-from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import pandas as pd
 import time
 import setup
 
@@ -65,3 +63,39 @@ def click_elem(elem, webdriver, wait):
         ActionChains(webdriver).scroll_(elem).perform()
         wait.until(EC.element_to_be_clickable(elem)).click()
     webdriver.fullscreen_window()
+
+def infinite_scroll(webdriver):
+    last_height = webdriver.execute_script("return document.body.scrollHeight")
+    i = 0
+    while True:
+        webdriver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(1)
+        new_height = webdriver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
+        i+=1
+        print(i)
+
+def test():
+    driver = setup.make_driver()
+    driver.get("https://www.amazon.com/hz/wishlist/ls/299PQKIASMWBC/ref=nav_wishlist_lists_1")
+    time.sleep(1)
+    driver.fullscreen_window()
+    time.sleep(1)
+    infinite_scroll(driver)
+    asin_list = driver.find_elements(By.CSS_SELECTOR, "[data-csa-c-item-id]")
+    asin_set = set()
+    for num in asin_list:
+        num = num.get_attribute("data-csa-c-item-id")
+        if "asin" in num:
+            continue
+        elif num in asin_set:
+            continue
+        else:
+            asin_set.add(num)
+    print(asin_set)
+    print(len(asin_set))
+    print(len(asin_list))
+
+test()
