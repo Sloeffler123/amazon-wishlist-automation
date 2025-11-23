@@ -8,19 +8,6 @@ load_dotenv()
 API_KEY = os.getenv("KEEPA_API_KEY")
 api = keepa.Keepa(API_KEY)
 
-def seperate_ISBN10_ISBN13(isbn_list):
-    isbn_13 = []
-    isbn_10 = []
-    for num in isbn_list:
-        try:
-            if "-" in num or len(num) > 10:
-                isbn_13.append(num.replace("-", ""))
-            else:
-                isbn_10.append(num)  
-        except TypeError:
-            print(f"{num} didnt work")                
-    return isbn_10, isbn_13
-
 def convert_to_currency(max, min, avg, current):
     lst = [max, min, avg, current]
     new_lst = []
@@ -78,29 +65,14 @@ def api_query():
     with open("data_file.txt", "r") as isbn_list:
         isbn_list = [line.rstrip("\n") for line in isbn_list]
     all_data_dict = {}
-    isbn_10, isbn_13 = seperate_ISBN10_ISBN13(isbn_list)
-    
+    asin_query = api.query(items=isbn_list, history=False, to_datetime=False, out_of_stock_as_nan=False, progress_bar=False, buybox=False, wait=False, offers=None, stock=False, stats=0)
     try:
-        isbn_13_products = api.query(items=isbn_13, history=False, to_datetime=False, out_of_stock_as_nan=False, progress_bar=False,buybox=False, wait=False, offers=None, stock=False, stats=0, product_code_is_asin=False)
-        
-    except KeyError:
-        print("key failed")
-    try:
-        main_loop(isbn_13_products, all_data_dict)
+        main_loop(asin_query, all_data_dict)
     except TimeoutError:
         time.sleep(10)
-        main_loop(isbn_13_products, all_data_dict)
-    try:
-        isbn_10_products = api.query(items=isbn_10, history=False, to_datetime=False, out_of_stock_as_nan=False, progress_bar=False,buybox=False, wait=False, offers=None, stock=False, stats=0)
-    except KeyError:
-        print(f"key failed")
-    try:
-        main_loop(isbn_10_products, all_data_dict)
-    except TimeoutError:
-        time.sleep(10)
-        main_loop(isbn_10_products, all_data_dict)
+        main_loop(asin_query, all_data_dict)
     df = pd.DataFrame(all_data_dict)
     print(df)
     df.to_csv("main_csv_data.csv", index=False)  
 
-# api_query()
+api_query()
