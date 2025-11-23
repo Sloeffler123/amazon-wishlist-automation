@@ -10,7 +10,7 @@ def main():
     harvest.get_data(driver)
     
 
-# main()
+main()
 
 
 #get the asin by using data-csa-c-item-id

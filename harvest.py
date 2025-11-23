@@ -1,11 +1,7 @@
-
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-import setup
 
 def continue_checker(webdrive):
     try:
@@ -17,74 +13,10 @@ def continue_checker(webdrive):
     except NoSuchElementException:
         print("Button wasnt there")
 
-def get_links(webdrive):
-    links = webdrive.find_elements(By.CSS_SELECTOR, "h2 a")
-    return links
-
-def get_ibn_number(webdriver):
-    ibn_num = webdriver.find_element(By.CSS_SELECTOR, "#detailBulletsWrapper_feature_div")
-    ibn_list = ibn_num.text.split()
-    return get_ibn_loop(ibn_list)
-
-def get_ibn_loop(ibn_list):
-    for i in range(len(ibn_list)):
-        if ibn_list[i] == "ISBN-10" or ibn_list[i] == "ISBN-13":
-            return ibn_list[i+2]
-        
 def get_data(webdriver):
-    wait = WebDriverWait(webdriver, 10)
-    i = 0
-    links_list_holder = []
-    isbn_list = []
-    while True:
-        time.sleep(7)
-        get_links_func = get_links(webdriver)
-        if get_links_func[i] not in links_list_holder:
-            elem = get_links_func[i]
-            click_elem(elem, webdriver, wait)
-            isbn_num = get_ibn_number(webdriver)
-            isbn_list.append(isbn_num)
-            setup.go_back_open_browser(webdriver)
-            i += 1
-            if i == len(get_links_func):
-                break  
-    with open ("data_file.txt", "w") as f:
-        f.write("\n".join(isbn_list))
 
-def click_elem(elem, webdriver, wait):
-    time.sleep(0.5)
-    ActionChains(webdriver).scroll_to_element(elem).perform()
-    ActionChains(webdriver).scroll_by_amount(0, 300).perform()
-    try:
-        time.sleep(0.5)
-        wait.until(EC.element_to_be_clickable(elem)).click()
-    except IndexError:
-        print("index error")
-        ActionChains(webdriver).scroll_(elem).perform()
-        wait.until(EC.element_to_be_clickable(elem)).click()
-    webdriver.fullscreen_window()
-
-def infinite_scroll(webdriver):
-    last_height = webdriver.execute_script("return document.body.scrollHeight")
-    i = 0
-    while True:
-        webdriver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(1)
-        new_height = webdriver.execute_script("return document.body.scrollHeight")
-        if new_height == last_height:
-            break
-        last_height = new_height
-        i+=1
-        print(i)
-
-def test():
-    driver = setup.make_driver()
-    driver.get("https://www.amazon.com/hz/wishlist/ls/299PQKIASMWBC/ref=nav_wishlist_lists_1")
-    time.sleep(1)
-    driver.fullscreen_window()
-    time.sleep(1)
-    infinite_scroll(driver)
-    asin_list = driver.find_elements(By.CSS_SELECTOR, "[data-csa-c-item-id]")
+    infinite_scroll(webdriver)
+    asin_list = webdriver.find_elements(By.CSS_SELECTOR, "[data-csa-c-item-id]")
     asin_set = set()
     for num in asin_list:
         num = num.get_attribute("data-csa-c-item-id")
@@ -94,8 +26,15 @@ def test():
             continue
         else:
             asin_set.add(num)
-    print(asin_set)
-    print(len(asin_set))
-    print(len(asin_list))
+    with open ("data_file.txt", "w") as f:
+        f.write("\n".join(asin_set))
 
-test()
+def infinite_scroll(webdriver):
+    last_height = webdriver.execute_script("return document.body.scrollHeight")
+    while True:
+        webdriver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(1)
+        new_height = webdriver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
