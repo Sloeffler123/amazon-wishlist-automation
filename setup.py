@@ -1,9 +1,4 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver import ActionChains
-from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
-from selenium.webdriver.chrome.options import Options
 import time
 
 def make_driver():
