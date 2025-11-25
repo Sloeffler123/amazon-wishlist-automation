@@ -13,7 +13,6 @@ def continue_checker(webdrive):
         print("Button wasnt there")
 
 def get_data(webdriver):
-
     infinite_scroll(webdriver)
     asin_list = webdriver.find_elements(By.CSS_SELECTOR, "[data-csa-c-item-id]")
     asin_set = set()

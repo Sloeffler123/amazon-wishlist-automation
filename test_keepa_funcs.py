@@ -1,7 +1,5 @@
-import pytest
 
-from keepa_api import convert_to_currency, determine_good_deal, add_vars_to_list, df_loop, make_data_dict
-
+from keepa_api import convert_to_currency, determine_good_deal, add_vars_to_list, df_loop
 
 def test_convert_to_currency():
     result = convert_to_currency(1000, 500, 750, 900)

@@ -66,7 +66,7 @@ def api_query():
     with open("data_file.txt", "r") as isbn_list:
         isbn_list = [line.rstrip("\n") for line in isbn_list]
     all_data_dict = {}
-    asin_query = api.query(items=isbn_list, history=False, to_datetime=False, out_of_stock_as_nan=False, progress_bar=False, buybox=False, wait=False, offers=None, stock=False, stats=0)
+    asin_query = api.query(items=isbn_list, history=False, to_datetime=False, out_of_stock_as_nan=False, progress_bar=False, wait=False, offers=None, stock=False, stats=0)
     try:
         main_loop(asin_query, all_data_dict)
     except TimeoutError:
@@ -75,5 +75,6 @@ def api_query():
     df = pd.DataFrame(all_data_dict)
     print(df)
     df.to_csv("main_csv_data.csv", index=False)  
+    print(asin_query)
 
-# api_query()
+api_query()
