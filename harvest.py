@@ -8,7 +8,7 @@ def continue_checker(webdrive):
         if button:
             button.click()
             webdrive.fullscreen_window()
-            time.sleep(2)
+            time.sleep(1)
     except NoSuchElementException:
         print("Button wasnt there")
 

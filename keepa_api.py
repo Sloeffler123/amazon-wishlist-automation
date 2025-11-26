@@ -60,7 +60,7 @@ def main_loop(isbn_list, data_dict):
             amazon_avg365_price = isbn_list[i]["stats"]["avg365"][0]
             make_data_dict(title, amazon_max_price, amazon_min_price, amazon_avg365_price, amazon_current_price, amazon_time_max_price, amazon_time_min_price, data_dict)
         except TypeError:
-            print(f"{isbn_list[i]} couldnt find value")
+            print(f"Couldn't find {title} data")
 
 def api_query():
     with open("data_file.txt", "r") as isbn_list:
