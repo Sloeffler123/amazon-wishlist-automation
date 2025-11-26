@@ -27,7 +27,6 @@ def determine_good_deal(max, min, current):
     deal = (current_int - min_int) / (max_int - min_int) * 100
     return round(deal) 
 
-# list from convert_to_currency = data_list
 def add_vars_to_list(data_list, name, max_date, min_date):
     data_list.append(max_date)
     data_list.append(min_date)
@@ -73,6 +72,4 @@ def api_query():
         time.sleep(10)
         main_loop(asin_query, all_data_dict)
     df = pd.DataFrame(all_data_dict)
-    print(df)
-    df.to_csv("main_csv_data.csv", index=False)  
-    print(asin_query)
+    df.to_csv("main_csv_data.csv", index=False)
