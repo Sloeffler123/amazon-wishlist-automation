@@ -1,5 +1,4 @@
 selenium==4.25.0
-keepa==1.5.1
 pandas==2.2.2
 python-dotenv==1.0.1
 webdriver-manager==4.0.2
