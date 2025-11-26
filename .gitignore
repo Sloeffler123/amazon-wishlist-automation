@@ -2,5 +2,4 @@ __pycache__
 *.pyc
 .env
 *.csv
-data_file.txt
 .pytest_cache
