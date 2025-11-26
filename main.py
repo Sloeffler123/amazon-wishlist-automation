@@ -8,6 +8,6 @@ def main():
     setup.open_browser(driver, AMAZON_URL)
     harvest.continue_checker(driver)
     harvest.get_data(driver)
-    keepa_api.api_query()
+    # keepa_api.api_query()
     
 main()

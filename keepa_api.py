@@ -76,5 +76,3 @@ def api_query():
     print(df)
     df.to_csv("main_csv_data.csv", index=False)  
     print(asin_query)
-
-api_query()
