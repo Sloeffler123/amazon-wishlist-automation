@@ -2,5 +2,5 @@ __pycache__
 *.pyc
 .env
 *.csv
-*.txt
+data_file.txt
 .pytest_cache
