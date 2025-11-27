@@ -1,8 +1,11 @@
 import harvest
 import setup
 import keepa_api
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-AMAZON_URL = "https://www.amazon.com/hz/wishlist/ls/299PQKIASMWBC/ref=nav_wishlist_lists_1"
+AMAZON_URL = os.getenv("AMAZON_URL")
 
 def main():
     driver = setup.make_driver()
