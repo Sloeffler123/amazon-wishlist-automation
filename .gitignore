@@ -2,3 +2,6 @@ __pycache__
 *.pyc
 .env
 .pytest_cache
+*.env
+data_file.txt
+main_csv_data_.csv
