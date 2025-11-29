@@ -14,4 +14,4 @@ def main():
     harvest.get_data(driver)
     keepa_api.api_query()
     driver.close()
-main()
+# main()

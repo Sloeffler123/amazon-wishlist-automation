@@ -16,6 +16,7 @@ def convert_to_currency(dict_for_values):
            dict_for_values[price] = f"{price[0:2]}.{price[2:4]}"
         else:
             dict_for_values[price] = f"{price[0:1]}.{price[1:3]}"
+    return dict_for_values
 
 def determine_good_deal(max, min, current):
     max_int = float(max)
@@ -28,18 +29,20 @@ def determine_good_deal(max, min, current):
 
 def add_vars_to_list(dict_for_values):
     dict_for_values["Deal or No Deal"] = determine_good_deal(dict_for_values["amazon_max_price"], dict_for_values["amazon_min_price"], dict_for_values["amazon_current_price"])
+    return dict_for_values
 
 def make_data_dict(dict_for_values, data_dict):
     column_names = ["Title", "Max", "Min", "Avg365", "Current", "Max Date", "Min Date", "Deal or No Deal"]
-    df_loop(column_names, add_vars_to_list(convert_to_currency(max, min, dict_for_values["amazon_avg365_price"], dict_for_values["amazon_current_price"]), dict_for_values["title"], max_date, min_date), data_dict)
+    df_loop(column_names, add_vars_to_list(dict_for_values), data_dict)
 
 def df_loop(column_names, dict_for_values, data_dict):
-    for name, data  in zip(column_names, main_list):
+    for name, data  in zip(column_names, dict_for_values.values()):
         if data_dict.get(name) is not None:
-            data_dict[name].append(data.value)
+            data_dict[name].append(data)
         else:
             data_dict[name] = [data]    
-            
+    return dict_for_values
+
 def main_loop(isbn_list, data_dict):
     for i in range(len(isbn_list)):
         try:
@@ -56,7 +59,7 @@ def main_loop(isbn_list, data_dict):
             amazon_time_min_price = keepa.keepa_minutes_to_time(dictionary_for_values["amazon_min_price_time"])
             dictionary_for_values["amazon_max_price_time"] = amazon_time_max_price
             dictionary_for_values["amazon_min_price_time"] = amazon_time_min_price
-            convert_to_currency()
+            convert_to_currency(dictionary_for_values)
             make_data_dict(dictionary_for_values, data_dict)
         except TypeError:
             print(f"Couldn't find {dictionary_for_values["title"]} data")
