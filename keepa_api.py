@@ -24,6 +24,8 @@ def determine_good_deal(max, min, current):
     max_int = float(max)
     min_int = float(min)
     current_int = float(current)
+    if -1 in (max_int, min_int, current_int):
+        return "No price history"
     deal = (current_int - min_int) / (max_int - min_int) * 100
     return round(deal) 
 
@@ -48,18 +50,26 @@ def df_loop(column_names, main_list, data_dict):
 def main_loop(isbn_list, data_dict):
     for i in range(len(isbn_list)):
         try:
-            title = isbn_list[i]["title"]
-            amazon_current_price = isbn_list[i]["stats"]["current"][0]
-            amazon_max_price = isbn_list[i]["stats"]["max"][0][1]
-            amazon_max_price_time = isbn_list[i]["stats"]["max"][0][0]
-            amazon_time_max_price = keepa.keepa_minutes_to_time(amazon_max_price_time)
-            amazon_min_price = isbn_list[i]["stats"]["min"][0][1]
-            amazon_min_price_time = isbn_list[i]["stats"]["min"][0][0]
-            amazon_time_min_price = keepa.keepa_minutes_to_time(amazon_min_price_time)
-            amazon_avg365_price = isbn_list[i]["stats"]["avg365"][0]
+            dictionary_for_values = {
+                "title": isbn_list[i]["title"],
+                "amazon_current_price" : isbn_list[i]["stats"]["current"][0],
+                "amazon_max_price" : isbn_list[i]["stats"]["max"][0][1],
+                "amazon_max_price_time" : isbn_list[i]["stats"]["max"][0][0],
+                "amazon_min_price" : isbn_list[i]["stats"]["min"][0][1],
+                "amazon_min_price_time" : isbn_list[i]["stats"]["min"][0][0],
+                "amazon_avg365_price" : isbn_list[i]["stats"]["avg365"][0],
+            }
+            amazon_time_max_price = keepa.keepa_minutes_to_time(dictionary_for_values["amazon_max_price_time"])
+            amazon_time_min_price = keepa.keepa_minutes_to_time(dictionary_for_values["amazon_min_price_time"])
+
             make_data_dict(title, amazon_max_price, amazon_min_price, amazon_avg365_price, amazon_current_price, amazon_time_max_price, amazon_time_min_price, data_dict)
         except TypeError:
             print(f"Couldn't find {title} data")
+
+def if_value_not_found(dict_for_values):
+    for k, v in dict_for_values.items():
+        if v < 0 or v is None:
+            dict_for_values[k] = "Value not found"
 
 def api_query():
     with open("data_file.txt", "r") as isbn_list:
