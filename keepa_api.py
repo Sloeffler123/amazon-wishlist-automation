@@ -8,17 +8,14 @@ load_dotenv()
 API_KEY = os.getenv("KEEPA_API_KEY")
 api = keepa.Keepa(API_KEY)
 
-def convert_to_currency(max, min, avg, current):
-    lst = [max, min, avg, current]
-    new_lst = []
-    for i in lst:
-        j = str(i)
-        if len(j) == 4:
-           num = f"{j[0:2]}.{j[2:4]}"
+def convert_to_currency(dict_for_values):
+    price_list = [dict_for_values["amazon_max_price"], dict_for_values["amazon_min_price"], dict_for_values["amazon_avg365_price"], dict_for_values["amazon_current_price"]]
+    for price in price_list:
+        price_string = str(price)
+        if len(price_string) == 4:
+           dict_for_values[price] = f"{price[0:2]}.{price[2:4]}"
         else:
-            num = f"{j[0:1]}.{j[1:3]}"
-        new_lst.append(num)        
-    return new_lst    
+            dict_for_values[price] = f"{price[0:1]}.{price[1:3]}"
 
 def determine_good_deal(max, min, current):
     max_int = float(max)
@@ -29,21 +26,17 @@ def determine_good_deal(max, min, current):
     deal = (current_int - min_int) / (max_int - min_int) * 100
     return round(deal) 
 
-def add_vars_to_list(data_list, name, max_date, min_date):
-    data_list.append(max_date)
-    data_list.append(min_date)
-    data_list.append(determine_good_deal(data_list[0], data_list[1], data_list[3]))
-    main_list = [name] + data_list
-    return main_list
+def add_vars_to_list(dict_for_values):
+    dict_for_values["Deal or No Deal"] = determine_good_deal(dict_for_values["amazon_max_price"], dict_for_values["amazon_min_price"], dict_for_values["amazon_current_price"])
 
-def make_data_dict(title, max, min, avg, current, max_date, min_date, data_dict):
+def make_data_dict(dict_for_values, data_dict):
     column_names = ["Title", "Max", "Min", "Avg365", "Current", "Max Date", "Min Date", "Deal or No Deal"]
-    df_loop(column_names, add_vars_to_list(convert_to_currency(max, min, avg, current), title, max_date, min_date), data_dict)
+    df_loop(column_names, add_vars_to_list(convert_to_currency(max, min, dict_for_values["amazon_avg365_price"], dict_for_values["amazon_current_price"]), dict_for_values["title"], max_date, min_date), data_dict)
 
-def df_loop(column_names, main_list, data_dict):
+def df_loop(column_names, dict_for_values, data_dict):
     for name, data  in zip(column_names, main_list):
         if data_dict.get(name) is not None:
-            data_dict[name].append(data)
+            data_dict[name].append(data.value)
         else:
             data_dict[name] = [data]    
             
@@ -52,19 +45,21 @@ def main_loop(isbn_list, data_dict):
         try:
             dictionary_for_values = {
                 "title": isbn_list[i]["title"],
-                "amazon_current_price" : isbn_list[i]["stats"]["current"][0],
                 "amazon_max_price" : isbn_list[i]["stats"]["max"][0][1],
-                "amazon_max_price_time" : isbn_list[i]["stats"]["max"][0][0],
                 "amazon_min_price" : isbn_list[i]["stats"]["min"][0][1],
-                "amazon_min_price_time" : isbn_list[i]["stats"]["min"][0][0],
                 "amazon_avg365_price" : isbn_list[i]["stats"]["avg365"][0],
+                "amazon_current_price" : isbn_list[i]["stats"]["current"][0],
+                "amazon_max_price_time" : isbn_list[i]["stats"]["max"][0][0],
+                "amazon_min_price_time" : isbn_list[i]["stats"]["min"][0][0],
             }
             amazon_time_max_price = keepa.keepa_minutes_to_time(dictionary_for_values["amazon_max_price_time"])
             amazon_time_min_price = keepa.keepa_minutes_to_time(dictionary_for_values["amazon_min_price_time"])
-
-            make_data_dict(title, amazon_max_price, amazon_min_price, amazon_avg365_price, amazon_current_price, amazon_time_max_price, amazon_time_min_price, data_dict)
+            dictionary_for_values["amazon_max_price_time"] = amazon_time_max_price
+            dictionary_for_values["amazon_min_price_time"] = amazon_time_min_price
+            convert_to_currency()
+            make_data_dict(dictionary_for_values, data_dict)
         except TypeError:
-            print(f"Couldn't find {title} data")
+            print(f"Couldn't find {dictionary_for_values["title"]} data")
 
 def if_value_not_found(dict_for_values):
     for k, v in dict_for_values.items():
