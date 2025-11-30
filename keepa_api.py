@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import keepa
 import time
+import traceback
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,19 +11,20 @@ api = keepa.Keepa(API_KEY)
 
 def convert_to_currency(dict_for_values):
     price_list = [dict_for_values["amazon_max_price"], dict_for_values["amazon_min_price"], dict_for_values["amazon_avg365_price"], dict_for_values["amazon_current_price"]]
-    for price in price_list:
+    price_vars = ["amazon_max_price", "amazon_min_price", "amazon_avg365_price", "amazon_current_price"]
+    for price, price_var in zip(price_list, price_vars):
         price_string = str(price)
         if len(price_string) == 4:
-           dict_for_values[price] = f"{price[0:2]}.{price[2:4]}"
+           dict_for_values[price_var] = f"{price_string[:2]}.{price_string[2:]}"
         else:
-            dict_for_values[price] = f"{price[0:1]}.{price[1:3]}"
+            dict_for_values[price_var] = f"{price_string[:1]}.{price_string[1:]}"
     return dict_for_values
 
 def determine_good_deal(max, min, current):
     max_int = float(max)
     min_int = float(min)
     current_int = float(current)
-    if -1 in (max_int, min_int, current_int):
+    if -.1 in (max_int, min_int, current_int):
         return "No price history"
     deal = (current_int - min_int) / (max_int - min_int) * 100
     return round(deal) 
@@ -34,6 +36,7 @@ def add_vars_to_list(dict_for_values):
 def make_data_dict(dict_for_values, data_dict):
     column_names = ["Title", "Max", "Min", "Avg365", "Current", "Max Date", "Min Date", "Deal or No Deal"]
     df_loop(column_names, add_vars_to_list(dict_for_values), data_dict)
+    return data_dict
 
 def df_loop(column_names, dict_for_values, data_dict):
     for name, data  in zip(column_names, dict_for_values.values()):
@@ -62,7 +65,8 @@ def main_loop(isbn_list, data_dict):
             convert_to_currency(dictionary_for_values)
             make_data_dict(dictionary_for_values, data_dict)
         except TypeError:
-            print(f"Couldn't find {dictionary_for_values["title"]} data")
+            traceback.print_exc()
+            print(f"Couldn't find {dictionary_for_values["title"]}")
 
 def if_value_not_found(dict_for_values):
     for k, v in dict_for_values.items():

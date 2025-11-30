@@ -1,22 +1,22 @@
 
-from keepa_api import convert_to_currency, determine_good_deal, add_vars_to_list, df_loop
+from keepa_api import convert_to_currency, determine_good_deal, add_vars_to_list, df_loop, make_data_dict
 
 dict_test_1 = {
     "title": "The Hobbit",
-    "amazon_max_price": "20.00",
-    "amazon_min_price": "10.00",
-    "amazon_avg365_price": "13.00",
-    "amazon_current_price": "12.00",
+    "amazon_max_price": 2000,
+    "amazon_min_price": 1000,
+    "amazon_avg365_price": 1300,
+    "amazon_current_price": 1200,
     "amazon_max_price_date": "2020-11-03",
     "amazon_min_price_date": "2019-12-20" 
 }
 
 dict_test_2 = {
     "title": "The Way of Kings",
-    "amazon_max_price": "25.50",
-    "amazon_min_price": "8.25",
-    "amazon_avg365_price": "13.00",
-    "amazon_current_price": "9.99",
+    "amazon_max_price": 2550,
+    "amazon_min_price": 825,
+    "amazon_avg365_price": 1300,
+    "amazon_current_price": 999,
     "amazon_max_price_date": "2022-12-03",
     "amazon_min_price_date": "2018-1-20" 
 }
@@ -49,9 +49,10 @@ def test_df_loop():
     data_dict = {}
     column_names = ["Title", "Max", "Min", "Avg365", "Current", "Max Date", "Min Date", "Deal or No Deal"]
     
-    df_loop(column_names, dict_values, data_dict)
-    add_vars_to_list(dict_values)
-    deal = dict_values["Deal or No Deal"]
+    df_loop(column_names, add_vars_to_list(dict_test_1), data_dict)
+    
+    deal = determine_good_deal(dict_test_1["amazon_max_price"], dict_test_1["amazon_min_price"], dict_test_1["amazon_current_price"])
+
     assert data_dict == {
         "Title": ["The Hobbit"],
         "Max": ["20.00"],
