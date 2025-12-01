@@ -1,70 +1,39 @@
 
-from keepa_api import convert_to_currency, determine_good_deal, add_vars_to_list, df_loop, make_data_dict
-
-dict_test_1 = {
-    "title": "The Hobbit",
-    "amazon_max_price": 2000,
-    "amazon_min_price": 1000,
-    "amazon_avg365_price": 1300,
-    "amazon_current_price": 1200,
-    "amazon_max_price_date": "2020-11-03",
-    "amazon_min_price_date": "2019-12-20" 
-}
-
-dict_test_2 = {
-    "title": "The Way of Kings",
-    "amazon_max_price": 2550,
-    "amazon_min_price": 825,
-    "amazon_avg365_price": 1300,
-    "amazon_current_price": 999,
-    "amazon_max_price_date": "2022-12-03",
-    "amazon_min_price_date": "2018-1-20" 
-}
+from keepa_api import convert_to_currency, determine_good_deal, add_vars_to_list, df_loop
 
 def test_convert_to_currency():
+    result = convert_to_currency(1000, 500, 750, 900)
+    assert result == ["10.00", "5.00", "7.50", "9.00"]
 
-    result = convert_to_currency(dict_test_1)
-    lst = [result["amazon_max_price"], result["amazon_min_price"], result["amazon_avg365_price"], result["amazon_current_price"]]
-    assert lst == ["20.00", "10.00", "13.00", "12.00"]
-
-    result2 = convert_to_currency(dict_test_2)
-    lst2 = [result2["amazon_max_price"], result2["amazon_min_price"], result2["amazon_avg365_price"], result2["amazon_current_price"]]
-    assert lst2 == ["25.50", "8.25", "13.00", "9.99"]
+    result2 = convert_to_currency(5000, 3000, 3500, 3850)
+    assert result2 == ["50.00", "30.00", "35.00", "38.50"]
 
 def test_determine_good_deal():
     assert determine_good_deal(2499, 899, 1247) == 22
-    assert determine_good_deal(5000, 1000, 1000) == 0   
+    assert determine_good_deal(5000, 1000, 1000) == 0  
     assert determine_good_deal(5000, 1000, 5000) == 100
-<<<<<<< HEAD
     assert determine_good_deal(-0.1, 1000, 2000) == "No price history"
 
-=======
-    assert determine_good_deal(2000, 1000, -0.1) == "No price history"
-    assert determine_good_deal(-0.1, 2000, 1000) == "No price history"
->>>>>>> 02f238c629f9540ba5b3018e96d3366a2dba7821
 def test_add_vars_to_list():
-
-    good_deal = determine_good_deal(dict_test_1["amazon_max_price"], dict_test_1["amazon_min_price"], dict_test_1["amazon_current_price"])
-    result = add_vars_to_list(dict_test_1)
-    lst = [result["title"], result["amazon_max_price"], result["amazon_min_price"], result["amazon_avg365_price"], result["amazon_current_price"], result["amazon_max_price_date"], result["amazon_min_price_date"], good_deal]
-    expected = ["The Hobbit", "20.00", "10.00", "13.00", "12.00", "2020-11-03", "2019-12-20", good_deal]
-    assert lst == expected
+    data_list = convert_to_currency(2000, 1000, 1300, 1500)
+    good_deal = determine_good_deal(2000, 1000, 1500)
+    result = add_vars_to_list(data_list, "Lord of the rings", "2023-03-20", "2019-11-28")
+    expected = ["Lord of the rings", "20.00", "10.00", "13.00", "15.00", "2023-03-20", "2019-11-28", good_deal]
+    assert result == expected
 
 def test_df_loop():
     data_dict = {}
     column_names = ["Title", "Max", "Min", "Avg365", "Current", "Max Date", "Min Date", "Deal or No Deal"]
-    
-    df_loop(column_names, add_vars_to_list(dict_test_1), data_dict)
-    
-    deal = determine_good_deal(dict_test_1["amazon_max_price"], dict_test_1["amazon_min_price"], dict_test_1["amazon_current_price"])
+    product_values = ["The Hobbit", "20.00", "8.00", "12.00", "11.00", "2024-08-22", "2018-02-01", determine_good_deal(2000, 800, 1100)]
+    df_loop(column_names, product_values, data_dict)
 
     assert data_dict == {
         "Title": ["The Hobbit"],
         "Max": ["20.00"],
-        "Min": ["10.00"],
-        "Avg365": ["13.00"],
-        "Current": ["12.00"],
-        "Max Date": ["2020-11-03"],
-        "Min Date": ["2019-12-20"],
-        "Deal or No Deal": [deal]
+        "Min": ["8.00"],
+        "Avg365": ["12.00"],
+        "Current": ["11.00"],
+        "Max Date": ["2024-08-22"],
+        "Min Date": ["2018-02-01"],
+        "Deal or No Deal": [25]
     }
