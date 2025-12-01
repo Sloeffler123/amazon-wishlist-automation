@@ -24,7 +24,7 @@ def determine_good_deal(max, min, current):
     max_int = float(max)
     min_int = float(min)
     current_int = float(current)
-    if -.1 in (max_int, min_int, current_int):
+    if -0.1 in (max_int, min_int, current_int):
         return "No price history"
     deal = (current_int - min_int) / (max_int - min_int) * 100
     return round(deal) 

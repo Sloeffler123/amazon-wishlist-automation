@@ -35,8 +35,8 @@ def test_determine_good_deal():
     assert determine_good_deal(2499, 899, 1247) == 22
     assert determine_good_deal(5000, 1000, 1000) == 0   
     assert determine_good_deal(5000, 1000, 5000) == 100
-    assert determine_good_deal(2000, 1000, -1) == "No price history"
-
+    assert determine_good_deal(2000, 1000, -0.1) == "No price history"
+    assert determine_good_deal(-0.1, 2000, 1000) == "No price history"
 def test_add_vars_to_list():
 
     good_deal = determine_good_deal(dict_test_1["amazon_max_price"], dict_test_1["amazon_min_price"], dict_test_1["amazon_current_price"])
