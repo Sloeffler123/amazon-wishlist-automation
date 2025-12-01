@@ -3,8 +3,8 @@ import setup
 import keepa_api
 import os
 from dotenv import load_dotenv
-load_dotenv()
 
+load_dotenv()
 AMAZON_URL = os.getenv("AMAZON_URL")
 
 def main():

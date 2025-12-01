@@ -12,6 +12,7 @@ def test_determine_good_deal():
     assert determine_good_deal(2499, 899, 1247) == 22
     assert determine_good_deal(5000, 1000, 1000) == 0   
     assert determine_good_deal(5000, 1000, 5000) == 100
+    assert determine_good_deal(-0.1, 1000, 2000) == "No price history"
 
 def test_add_vars_to_list():
     data_list = convert_to_currency(2000, 1000, 1300, 1500)

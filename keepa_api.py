@@ -9,21 +9,23 @@ API_KEY = os.getenv("KEEPA_API_KEY")
 api = keepa.Keepa(API_KEY)
 
 def convert_to_currency(max, min, avg, current):
-    lst = [max, min, avg, current]
-    new_lst = []
-    for i in lst:
-        j = str(i)
-        if len(j) == 4:
-           num = f"{j[0:2]}.{j[2:4]}"
+    prices = [max, min, avg, current]
+    new_prices = []
+    for price in prices:
+        price_to_string = str(price)
+        if len(price_to_string) == 4:
+           num = f"{price_to_string[0:2]}.{price_to_string[2:4]}"
         else:
-            num = f"{j[0:1]}.{j[1:3]}"
-        new_lst.append(num)        
-    return new_lst    
+            num = f"{price_to_string[0:1]}.{price_to_string[1:3]}"
+        new_prices.append(num)        
+    return new_prices    
 
 def determine_good_deal(max, min, current):
     max_int = float(max)
     min_int = float(min)
     current_int = float(current)
+    if -0.1 in (max_int, min_int, current_int):
+        return "No price history"
     deal = (current_int - min_int) / (max_int - min_int) * 100
     return round(deal) 
 
@@ -59,7 +61,7 @@ def main_loop(isbn_list, data_dict):
             amazon_avg365_price = isbn_list[i]["stats"]["avg365"][0]
             make_data_dict(title, amazon_max_price, amazon_min_price, amazon_avg365_price, amazon_current_price, amazon_time_max_price, amazon_time_min_price, data_dict)
         except TypeError:
-            print(f"Couldn't find {title} data")
+            print(f"Couldn't find {title}")
 
 def api_query():
     with open("data_file.txt", "r") as isbn_list:
