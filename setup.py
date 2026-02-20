@@ -1,5 +1,4 @@
 from selenium import webdriver
-import time
 
 def make_driver():
     chrome_options = webdriver.ChromeOptions()
@@ -13,6 +12,4 @@ def make_driver():
 
 def open_browser(webdrive, url):
     webdrive.get(url)
-    time.sleep(1)
     webdrive.fullscreen_window()
-    time.sleep(1)
